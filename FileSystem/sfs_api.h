@@ -52,17 +52,17 @@ typedef struct freeblocks
 
 rootDirectory root;
 fat FAT;
-freeblocks freeblocks;
+freeblocks freeList;
 fdtNode fdt[MAXIMUM_FILES];
 
 static int opened_files = 0;
 
-static int dbsize;
+static int fsSize;
 static int fatSize;
 static int BLOCKSIZE;
 
 
-int mksfs(int fresh);
+void mksfs(int fresh);
 
 void sfs_ls(void);
 

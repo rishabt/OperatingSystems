@@ -1,10 +1,11 @@
 #include "sfs_api.h"
 
 
-int mksfs(int fresh)
+void mksfs(int fresh)
 {
-
-	return 0;
+	fsSize     = sizeof(rootDirectory);
+	fatSize     = sizeof(fat);
+	BLOCKSIZE   = ( fsSize > fatSize ? fsSize : fatSize );
 }
 
 void sfs_ls(void)
