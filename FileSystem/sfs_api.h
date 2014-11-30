@@ -38,9 +38,7 @@ typedef struct fat
 typedef struct fdtNode
 {
     char filename[32];
-    //int fileId;   // The index in the array of the fdt acts as the fileId
     int root_index;
-    //fat_node root_fat;
     int opened;
     int write_ptr;
     int read_ptr;
