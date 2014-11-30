@@ -19,13 +19,13 @@ typedef struct diskFile
 
 typedef struct rootDirectory
 {
-    diskFile dir_table[MAXIMUM_FILES];
+    diskFile directory_table[MAXIMUM_FILES];
     int next;
 } rootDirectory;
 
 typedef struct fatNode
 {
-    int db_index;
+    int index;
     int next;
 } fatNode;
 
