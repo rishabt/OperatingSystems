@@ -9,6 +9,7 @@ void mksfs(int fresh)
 
 	if(fresh)
 	{
+		// Initialize fresh disk
 		int init = init_fresh_disk("root_dir.sfs", BLOCKSIZE, DISKSIZE);
 
 		if(init)
@@ -32,14 +33,23 @@ void mksfs(int fresh)
 			FAT.next = 0;									// Cursor set to 0
 
 			// Write blocks for root, fat, and free blocks
-			write_blocks( 0, 1, (void *)&root );
-			write_blocks( 1, 1, (void *)&FAT );
+			write_blocks(0, 1, (void *)&root);
+			write_blocks(1, 1, (void *)&FAT);
 			write_blocks(DISKSIZE-1, 1, (void *)&freeblocks);
 		}
 	}
 	else
 	{
+		// Initialize disk
+		int init = init_disk("root_dir.sfs", BLOCKSIZE, DISKSIZE);
 
+		if(init)
+		{
+			// Since it's not a fresh file system, read existing blocks
+		    read_blocks(0, 1, (void *)&root);
+		    read_blocks(1, 1, (void *)&FAT);
+		    read_blocks(DISKSIZE-1, 1, (void *)&freeblocks);
+		}
 	}
 }
 
