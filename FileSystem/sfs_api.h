@@ -49,6 +49,19 @@ typedef struct freeblocks
     int freeblocks[DISKSIZE];
 } freeblocks;
 
+
+rootDirectory root;
+fat FAT;
+freeblocks freeblocks;
+fdtNode fdt[MAXIMUM_FILES];
+
+static int opened_files = 0;
+
+static int dbsize;
+static int fatSize;
+static int BLOCKSIZE;
+
+
 int mksfs(int fresh);
 
 void sfs_ls(void);
