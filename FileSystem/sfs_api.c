@@ -78,6 +78,19 @@ int sfs_fopen(char *name)
 	{
 		fdt[opened_files].write_ptr = 0;
 		FAT.fatNodes[FAT.next].index = getNextFreeBlock();
+
+		FAT.fatNodes[FAT.next].next = -1;
+		root.directory_table[root.next].isEmpty = 0;
+
+		strcpy(root.directory_table[root.next].name, name);
+
+		root.directory_table[root.next].fat_index = FAT.next;
+		root.directory_table[root.next].size = 0;
+		root.directory_table[root.next].creation_time = time(NULL);
+
+		write_blocks( 0, 1, (void *)&root );
+		write_blocks( 1, 1, (void *)&FAT );
+		write_blocks(DISKSIZE-1, 1, (void *)&freeList);
 	}
 	else								// Existing file
 	{
