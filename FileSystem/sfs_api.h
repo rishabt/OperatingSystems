@@ -77,3 +77,5 @@ int sfs_fread(int fileID, char *buf, int length);
 int sfs_fseek(int fileID, int offset);
 
 int sfs_remove(char *file);
+
+int getFileIndex(char* name);

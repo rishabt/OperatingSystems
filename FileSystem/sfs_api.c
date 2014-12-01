@@ -67,6 +67,7 @@ void sfs_ls(void)
 
 int sfs_fopen(char *name)
 {
+
 	return 0;
 }
 
@@ -93,4 +94,20 @@ int sfs_fseek(int fileID, int offset)
 int sfs_remove(char *file)
 {
 	return 0;
+}
+
+
+
+int getFileIndex(char* name)
+{
+	int i;
+	for(i = 0; i < MAXIMUM_FILES; i++)
+	{
+		if(strcmp(name, root.directory_table[i].name) == 0)
+		{
+			return i;
+		}
+	}
+
+	return -1;
 }
