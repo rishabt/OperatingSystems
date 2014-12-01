@@ -151,8 +151,10 @@ int getFileIndex(char* name)
 int getNextFreeBlock()
 {
 	int i;
-	for(i = 2; i < DISKSIZE - 1; i++) {
-		if (freeList.freeblocks[i] == 0) {
+	for(i = 2; i < DISKSIZE - 1; i++)
+	{
+		if (freeList.freeblocks[i] == 0)
+		{
 			freeList.freeblocks[i] = 1;
 			return i;
 		}
@@ -162,4 +164,56 @@ int getNextFreeBlock()
 	printf("next free block: %d\n", i);
 
 	return -1;
+}
+
+int getNextFatIndex()
+{
+    FAT.next += 1;
+
+    if (FAT.next > DISKSIZE - 1)
+    {
+        int i;
+        for (i = 0; i < DISKSIZE; i++)
+        {
+            if (FAT.fatNodes[i].index == EMPTY)
+            {
+                break;
+            }
+        }
+
+        FAT.next = i;
+        if (i == DISKSIZE)
+        {
+            printf("WARNING DISK IS FULL\n");
+            return -1;
+        }
+    }
+
+    return 0;
+}
+
+int getNextRootIndex()
+{
+    root.next += 1;
+
+    if (root.next > MAXIMUM_FILES - 1)
+    {
+        int i;
+        for (i = 0; i < MAXIMUM_FILES; i++)
+        {
+            if (root.directory_table[i].isEmpty == 1)
+            {
+                break;
+            }
+        }
+
+        root.next = i;
+        if (i == MAXIMUM_FILES)
+        {
+            printf("WARNING MAXIMUM FILE CAPACITY REACHED\n");
+            return -1;
+        }
+    }
+
+    return 0;
 }

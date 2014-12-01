@@ -81,3 +81,7 @@ int sfs_remove(char *file);
 int getFileIndex(char* name);
 
 int getNextFreeBlock();
+
+int getNextFatIndex();
+
+int getNextRootIndex();
