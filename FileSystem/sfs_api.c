@@ -94,6 +94,15 @@ int sfs_fopen(char *name)
 
 		fdt[fileID].root_index = root.next;
 
+		if (getNextFatIndex() == -1)
+		{
+			exit(1);
+		}
+
+		if (getNextRootIndex() == -1)
+		{
+			exit(1);
+		}
 
 		write_blocks( 0, 1, (void *)&root );
 		write_blocks( 1, 1, (void *)&FAT );
