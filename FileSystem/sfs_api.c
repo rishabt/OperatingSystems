@@ -67,12 +67,15 @@ void sfs_ls(void)
 
 int sfs_fopen(char *name)
 {
+	int fileID;
 	int fileIndex = getFileIndex(name);
 
 	strcpy( fdt[opened_files].filename, name );
 	fdt[opened_files].opened = 1;
 	fdt[opened_files].read_ptr = 0;
 	++opened_files;
+
+	fileID = opened_files;
 
 	if(fileIndex == -1)					// New File
 	{
@@ -88,14 +91,18 @@ int sfs_fopen(char *name)
 		root.directory_table[root.next].size = 0;
 		root.directory_table[root.next].creation_time = time(NULL);
 
+		fdt[fileID].root_index = root.next;
+
+
 		write_blocks( 0, 1, (void *)&root );
 		write_blocks( 1, 1, (void *)&FAT );
 		write_blocks(DISKSIZE-1, 1, (void *)&freeList);
 	}
 	else								// Existing file
 	{
-
+		fdt[fileID].write_ptr = root.directory_table[fileIndex].size;
 	}
+
 	return 0;
 }
 
