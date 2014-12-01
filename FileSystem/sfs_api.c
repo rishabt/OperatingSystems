@@ -134,7 +134,65 @@ int sfs_fclose(int fileID)
 
 int sfs_fwrite(int fileID, char *buf, int length)
 {
-	return 0;
+	if(fileID <= opened_files)
+	{
+		fprintf(stderr, "File does not exist %d", fileID);
+		return -1;
+	}
+
+	int len = length;
+
+	int root_index = fdt[fileID].root_index;
+	int fat_index = root.directory_table[root_index].fat_index;
+	int index = FAT.fatNodes[fat_index].index;
+
+	while(FAT.fatNodes[fat_index].next != -1)
+	{
+		index = FAT.fatNodes[fat_index].index;
+		fat_index = FAT.fatNodes[fat_index].next;
+	}
+
+	char temp[BLOCKSIZE];
+
+	read_blocks(index, 1, (void *)temp);
+
+	int write_pointer = sizeInBlock(fdt[fileID].write_ptr);
+
+	if (write_pointer != -1)
+	{
+		memcpy((temp + write_pointer), buf, (BLOCKSIZE - write_pointer));
+
+		write_blocks(index, 1, (void *)temp);
+		length = length - (BLOCKSIZE - write_pointer);
+		buf = buf + (BLOCKSIZE - write_pointer);
+	}
+
+	while (length > 0)
+	{
+		memcpy( temp, buf, BLOCKSIZE );
+
+		index = getNextFreeBlock();
+
+		FAT.fatNodes[fat_index].next = FAT.next;
+		FAT.fatNodes[FAT.next].index = index;
+		fat_index = FAT.next;
+		FAT.fatNodes[fat_index].next = -1;
+		getNextFatIndex();
+
+		length = length - BLOCKSIZE;
+		buf = buf + BLOCKSIZE;
+
+		write_blocks(index, 1, (void *)temp);
+	}
+
+	root.directory_table[root_index].size += len;
+	fdt[fileID].write_ptr = root.directory_table[root_index].size;
+
+	write_blocks(0, 1, (void *)&root);
+	write_blocks(1, 1, (void *)&FAT);
+	write_blocks(DISKSIZE-1, 1, (void *)&freeList);
+
+	return 1;
 }
 
 int sfs_fread(int fileID, char *buf, int length)
@@ -255,4 +313,24 @@ int isFileOpen(char* name)
     }
 
     return -1;
+}
+
+int sizeInBlock(int size)
+{
+    if (size == 0)
+    {
+    	return 0;
+    }
+
+    if (size % BLOCKSIZE == 0)
+    {
+        return -1;
+    }
+
+    while(size > BLOCKSIZE)
+    {
+        size -= BLOCKSIZE;
+    }
+
+    return size;
 }
