@@ -118,7 +118,18 @@ int sfs_fopen(char *name)
 
 int sfs_fclose(int fileID)
 {
-	return 0;
+	if (opened_files <= fileID)
+	{
+		fprintf(stderr, "File does not exist %d", fileID);
+		return -1;
+	}
+	else
+	{
+		fdt[ fileID ].opened = 0;
+		return 1;
+	}
+
+	return -1;
 }
 
 int sfs_fwrite(int fileID, char *buf, int length)
