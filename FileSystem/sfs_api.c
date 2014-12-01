@@ -67,7 +67,7 @@ void sfs_ls(void)
 
 int sfs_fopen(char *name)
 {
-	int fileID;
+	int fileID = isFileOpen;
 	int fileIndex = getFileIndex(name);
 
 	strcpy( fdt[opened_files].filename, name );
@@ -216,4 +216,22 @@ int getNextRootIndex()
     }
 
     return 0;
+}
+
+int isFileOpen(char* name)
+{
+    int i;
+    int result;
+
+    for(i = 0; i < MAXIMUM_FILES; i++)
+    {
+        result = strcmp( fdt[i].filename, name );
+
+        if ( result == 0 )
+        {
+            return i;
+        }
+    }
+
+    return -1;
 }

@@ -85,3 +85,5 @@ int getNextFreeBlock();
 int getNextFatIndex();
 
 int getNextRootIndex();
+
+int isFileOpen(char* name);
