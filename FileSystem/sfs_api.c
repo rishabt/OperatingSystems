@@ -56,6 +56,7 @@ void mksfs(int fresh)
 void sfs_ls(void)
 {
 	int i;
+	// Print name, size (in KB, divide by 1000) and time (convert to c-string to make it readable)
 	for(i = 0; root.directory_table[i].isEmpty == 0; i++)
 	{
 		printf("%s  %dKB  %s", root.directory_table[i].name, (root.directory_table[i].size/1000),
