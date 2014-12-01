@@ -35,7 +35,7 @@ void mksfs(int fresh)
 			// Write blocks for root, fat, and free blocks
 			write_blocks(0, 1, (void *)&root);
 			write_blocks(1, 1, (void *)&FAT);
-			write_blocks(DISKSIZE-1, 1, (void *)&freeblocks);
+			write_blocks(DISKSIZE-1, 1, (void *)&freeList);
 		}
 	}
 	else
@@ -48,14 +48,20 @@ void mksfs(int fresh)
 			// Since it's not a fresh file system, read existing blocks
 		    read_blocks(0, 1, (void *)&root);
 		    read_blocks(1, 1, (void *)&FAT);
-		    read_blocks(DISKSIZE-1, 1, (void *)&freeblocks);
+		    read_blocks(DISKSIZE-1, 1, (void *)&freeList);
 		}
 	}
 }
 
 void sfs_ls(void)
 {
+	int i;
+	for(i = 0; root.directory_table[i].isEmpty == 0; i++)
+	{
+		printf("%s  %dKB  %s", root.directory_table[i].name, (root.directory_table[i].size/1000),
+				ctime(root.directory_table[i].creation_time));
 
+	}
 }
 
 int sfs_fopen(char *name)
