@@ -79,3 +79,5 @@ int sfs_fseek(int fileID, int offset);
 int sfs_remove(char *file);
 
 int getFileIndex(char* name);
+
+int getNextFreeBlock();

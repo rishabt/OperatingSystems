@@ -76,7 +76,8 @@ int sfs_fopen(char *name)
 
 	if(fileIndex == -1)					// New File
 	{
-
+		fdt[opened_files].write_ptr = 0;
+		FAT.fatNodes[FAT.next].index = getNextFreeBlock();
 	}
 	else								// Existing file
 	{
@@ -122,6 +123,23 @@ int getFileIndex(char* name)
 			return i;
 		}
 	}
+
+	return -1;
+}
+
+
+int getNextFreeBlock()
+{
+	int i;
+	for(i = 2; i < DISKSIZE - 1; i++) {
+		if (freeList.freeblocks[i] == 0) {
+			freeList.freeblocks[i] = 1;
+			return i;
+		}
+	}
+
+	printf("WARNING DISK IS FULL\n");
+	printf("next free block: %d\n", i);
 
 	return -1;
 }
