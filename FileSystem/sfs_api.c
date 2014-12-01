@@ -67,7 +67,21 @@ void sfs_ls(void)
 
 int sfs_fopen(char *name)
 {
+	int fileIndex = getFileIndex(name);
 
+	strcpy( fdt[opened_files].filename, name );
+	fdt[opened_files].opened = 1;
+	fdt[opened_files].read_ptr = 0;
+	++opened_files;
+
+	if(fileIndex == -1)					// New File
+	{
+
+	}
+	else								// Existing file
+	{
+
+	}
 	return 0;
 }
 
