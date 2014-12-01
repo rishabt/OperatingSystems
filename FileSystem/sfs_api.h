@@ -89,3 +89,5 @@ int getNextRootIndex();
 int isFileOpen(char* name);
 
 int sizeInBlock(int size);
+
+int getReadBlock(int size);

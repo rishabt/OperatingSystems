@@ -197,7 +197,63 @@ int sfs_fwrite(int fileID, char *buf, int length)
 
 int sfs_fread(int fileID, char *buf, int length)
 {
-	return 0;
+	if (opened_files <= fileID && fdt[ fileID ].opened == 0 )
+	{
+		fprintf(stderr, "No file with ID %d is opened\n", fileID);
+		return -1;
+	}
+
+	char* pointer = buf;
+
+	char temp[BLOCKSIZE];
+
+	int root_index = fdt[fileID].root_index;
+	int fat_index = root.directory_table[root_index].fat_index;
+
+	int index;
+	index = FAT.fatNodes[fat_index].index;
+
+	int read_pointer = sizeInBlock(fdt[ fileID ].read_ptr);
+
+	int read_block_pointer = getReadBlock(fdt[ fileID ].read_ptr);
+
+	while (read_block_pointer > 0)
+	{
+		if (FAT.fatNodes[fat_index].next != -1)
+		{
+			fat_index = FAT.fatNodes[fat_index].next;
+			--read_block_pointer;
+		}
+	}
+
+	index = FAT.fatNodes[fat_index].index;
+
+	read_blocks(index, 1, temp);
+	memcpy(pointer, (temp + read_pointer), (BLOCKSIZE - read_pointer));
+
+	length = length - (BLOCKSIZE - read_pointer);
+	pointer = pointer + (BLOCKSIZE - read_pointer);
+
+	fat_index = FAT.fatNodes[fat_index].next;
+
+	while((FAT.fatNodes[fat_index].next != -1) && (length > 0) && (length > BLOCKSIZE)) {
+		index = FAT.fatNodes[fat_index].index;
+		read_blocks(index, 1, temp);
+
+		memcpy(pointer, temp, BLOCKSIZE);
+
+		length -= BLOCKSIZE;
+		pointer = pointer + BLOCKSIZE;
+		fat_index = FAT.fatNodes[fat_index].next;
+	}
+
+	index = FAT.fatNodes[fat_index].index;
+	read_blocks(index, 1, temp);
+
+	memcpy(pointer, temp, length);
+	fdt[fileID].read_ptr += length;
+
+	return 1;
 }
 
 int sfs_fseek(int fileID, int offset)
@@ -333,4 +389,17 @@ int sizeInBlock(int size)
     }
 
     return size;
+}
+
+int getReadBlock(int size)
+{
+    int block = 0;
+
+    while (size > BLOCKSIZE)
+    {
+        size -= BLOCKSIZE;
+        ++block;
+    }
+
+    return block;
 }
