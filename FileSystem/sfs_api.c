@@ -73,9 +73,9 @@ int sfs_fopen(char *name)
 	strcpy( fdt[opened_files].filename, name );
 	fdt[opened_files].opened = 1;
 	fdt[opened_files].read_ptr = 0;
-	++opened_files;
 
 	fileID = opened_files;
+	++opened_files;
 
 	if(fileIndex == -1)					// New File
 	{
@@ -103,7 +103,7 @@ int sfs_fopen(char *name)
 		fdt[fileID].write_ptr = root.directory_table[fileIndex].size;
 	}
 
-	return 0;
+	return fileID;
 }
 
 int sfs_fclose(int fileID)
