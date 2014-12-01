@@ -59,7 +59,7 @@ void sfs_ls(void)
 	for(i = 0; root.directory_table[i].isEmpty == 0; i++)
 	{
 		printf("%s  %dKB  %s", root.directory_table[i].name, (root.directory_table[i].size/1000),
-				ctime(root.directory_table[i].creation_time));
+				ctime(&root.directory_table[i].creation_time));
 
 	}
 }
