@@ -120,7 +120,7 @@ int sfs_fclose(int fileID)
 {
 	if (opened_files <= fileID)
 	{
-		fprintf(stderr, "File does not exist %d", fileID);
+		fprintf(stderr, "File does not exist %d\n", fileID);
 		return -1;
 	}
 	else
@@ -136,7 +136,7 @@ int sfs_fwrite(int fileID, char *buf, int length)
 {
 	if(fileID <= opened_files)
 	{
-		fprintf(stderr, "File does not exist %d", fileID);
+		fprintf(stderr, "File does not exist %d\n", fileID);
 		return -1;
 	}
 
@@ -258,11 +258,47 @@ int sfs_fread(int fileID, char *buf, int length)
 
 int sfs_fseek(int fileID, int offset)
 {
-	return 0;
+	if (opened_files <= fileID)
+	{
+		fprintf(stderr, "No file with ID %d is opened\n", fileID);
+		return -1;
+	}
+
+	fdt[fileID].write_ptr = offset;
+	fdt[fileID].read_ptr = offset;
+
+	return 1;
 }
 
 int sfs_remove(char *file)
 {
+	int temp_fat_index;
+	int root_index = getFileIndex(file);
+	if (root_index == -1)
+	{
+		return -1;
+	}
+
+	int fat_index;
+
+	root.directory_table[root_index].isEmpty = 1;
+	fat_index = root.directory_table[root_index].fat_index;
+
+	while(FAT.fatNodes[fat_index].next != EMPTY)
+	{
+		FAT.fatNodes[fat_index].index = EMPTY;
+		temp_fat_index = FAT.fatNodes[fat_index].next;
+
+		FAT.fatNodes[fat_index].next = EMPTY;
+		fat_index = temp_fat_index;
+	}
+
+	int fdt_index = isFileOpen(file);
+	if ( fdt_index != -1 )
+	{
+		fdt[ fdt_index ].opened = 0;
+	}
+
 	return 0;
 }
 
