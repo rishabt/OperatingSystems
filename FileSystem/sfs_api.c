@@ -52,7 +52,7 @@ void mksfs(int fresh)
 void sfs_ls(void)
 {
 	int i = 0;
-
+	// Print name, size (in KB, divide by 1000) and time (convert to c-string to make it readable)
 	while(i < MAXIMUM_FILES)
 	{
 		if(root.directory_table[i].isEmpty == 0)
@@ -62,15 +62,6 @@ void sfs_ls(void)
 		}
 		i++;
 	}
-
-	printf("FILES %d", i);
-	// Print name, size (in KB, divide by 1000) and time (convert to c-string to make it readable)
-//	for(i = 0; root.directory_table[i].isEmpty == 0; i++)
-//	{
-//		printf("%s  %dKB  %s", root.directory_table[i].name, (root.directory_table[i].size/1000),
-//				ctime(&root.directory_table[i].creation_time));
-//
-//	}
 }
 
 int sfs_fopen(char *name)
@@ -81,7 +72,7 @@ int sfs_fopen(char *name)
 	{
 		return fileID;
 	}
-	printf("HERE 1\n");
+
 	int fileIndex = getFileIndex(name);
 
 	strcpy(fdt[opened_files].filename, name);
@@ -139,7 +130,7 @@ int sfs_fclose(int fileID)
 	else
 	{
 		fdt[ fileID ].opened = 0;
-		return 1;
+		return 0;
 	}
 
 	return -1;
@@ -147,9 +138,10 @@ int sfs_fclose(int fileID)
 
 int sfs_fwrite(int fileID, char *buf, int length)
 {
-	if(fileID <= opened_files)
+	if(fileID >= opened_files)
 	{
 		fprintf(stderr, "File does not exist %d\n", fileID);
+		printf("OPEN FILES:%d, fileID:%d\n", opened_files, fileID);
 		return -1;
 	}
 
@@ -182,7 +174,7 @@ int sfs_fwrite(int fileID, char *buf, int length)
 
 	while (length > 0)
 	{
-		memcpy( temp, buf, BLOCKSIZE );
+		memcpy(temp, buf, BLOCKSIZE);
 
 		index = getNextFreeBlock();
 
@@ -205,7 +197,7 @@ int sfs_fwrite(int fileID, char *buf, int length)
 	write_blocks(1, 1, (void *)&FAT);
 	write_blocks(DISKSIZE-1, 1, (void *)&freeList);
 
-	return 1;
+	return len;
 }
 
 int sfs_fread(int fileID, char *buf, int length)
