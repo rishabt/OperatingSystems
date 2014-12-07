@@ -4,63 +4,46 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define DISKSIZE 1000
-#define MAXIMUM_FILES 100
-#define EMPTY (-2)
+#ifndef _HEADER_
+#define _HEADER_
 
-typedef struct diskFile
-{
-    char name[32];
-    int fat_index;
-    time_t creation_time;
-    int size;           // In bytes
-    int isEmpty;
-} diskFile;
+#define BLOCK 0
+#define FREELIST 1
+#define ROOTLOCATION 2
+#define SIZE_ROOT 20
+#define FATLOCATION ROOTLOCATION + SIZE_ROOT
+#define SIZE_FAT 4
+#define STARTDATA FATLOCATION + SIZE_FAT
+#define BLOCK_SIZE 2048
 
-typedef struct rootDirectory
-{
-    diskFile directory_table[MAXIMUM_FILES];
-    int next;
-} rootDirectory;
+#define NUMBER_BLOCKS 1 + BLOCK_SIZE + SIZE_ROOT + SIZE_FAT
 
-typedef struct fatNode
-{
-    int index;
-    int next;
-} fatNode;
+#define MAXNAME 30
+#define FILENAME "root.sfs"
 
-typedef struct fat
-{
-    fatNode fatNodes[DISKSIZE];
-    int next;
-} fat;
+typedef struct filesystem_entry {
+    char filename[MAXNAME + 1];
+    unsigned short index;
+    unsigned int size;
+    time_t creationTime;
+} filesystem_entry;
 
-typedef struct fdtNode
-{
-    char filename[32];
-    int root_index;
-    int opened;
-    int write_ptr;
-    int read_ptr;
-} fdtNode;
+typedef struct FAT_Node {
+    unsigned short stored_data;
+    unsigned short next;
+} FAT_Node;
 
-typedef struct freeblocks
-{
-    int freeblocks[DISKSIZE];
-} freeblocks;
+typedef struct descriptor {
+    unsigned int rd_ptr;
+    unsigned int wt_ptr;
+    unsigned int size;
+    unsigned short ptr_start;
+} descriptor;
 
-
-rootDirectory root;
-fat FAT;
-freeblocks freeList;
-fdtNode fdt[MAXIMUM_FILES];
-
-static int opened_files = 0;
-
-static int fsSize;
-static int fatSize;
-static int BLOCKSIZE;
-
+int open_files;
+filesystem_entry *root;
+descriptor **fdt;
+FAT_Node *FAT;
 
 void mksfs(int fresh);
 
@@ -78,16 +61,10 @@ int sfs_fseek(int fileID, int offset);
 
 int sfs_remove(char *file);
 
-int getFileIndex(char* name);
+int getFirstUnusedSpot();
 
-int getNextFreeBlock();
+void allocateIndex(unsigned short indx);
 
-int getNextFatIndex();
+void freeIndex(unsigned short indx);
 
-int getNextRootIndex();
-
-int isFileOpen(char* name);
-
-int sizeInBlock(int size);
-
-int getReadBlock(int size);
+#endif

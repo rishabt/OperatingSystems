@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <time.h>
 #include "disk_emu.h"
-
+#include <malloc.h>
 
 FILE* fp = NULL;
 double L, p;
@@ -127,9 +127,7 @@ int read_blocks(int start_address, int nblocks, void *buffer)
             memcpy(buffer+(i*BLOCK_SIZE), blockRead, BLOCK_SIZE);  
         }
     }
-
     free(blockRead);
-
 
     /*If no failure return the number of blocks read, else return the negative number of failures*/
     if (e == 0)
